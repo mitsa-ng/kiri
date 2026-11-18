@@ -122,15 +122,14 @@ t("dragging a column's edge to the left widens it: its far edge is the left one"
   delete widths().containers; fitColumns();
 });
 
-// A Compose project, and another engine behind `docker`: two lines the page joins itself.
+// Compose containers (their project is a link under the name), and another engine behind `docker`: a line the page joins itself.
 const member = (id, name, state) => ({ Id: id, Names: ["/" + name], Image: "nginx:alpine", State: state, Status: state === "running" ? "Up 1 hour" : "Exited (0)", Created: Date.now() / 1000 - 3600, Ports: [], Labels: { "com.docker.compose.project": "shop" } });
 kiri.on({ type: "lists", containers: [...ui.containers, member("c1", "shop_web_1", "running"), member("c2", "shop_db_1", "exited")], images: ui.images, volumes: ui.volumes, networks: ui.networks });
 kiri.on({ ...ui.status, type: "status", app: "Kiri Dev", ours: "kiri", context: "default" });
 show("containers");
 t("a line the page joins itself keeps its Arabic words in order", () => {
-  // "Compose", then Arabic words: marked, so it starts on the right like the rows around it.
-  const sub = document.querySelector("tr.group .sub-name");
-  if (!sub.textContent.startsWith("\u200FCompose")) throw new Error("the project's line: " + JSON.stringify(sub.textContent));
+  // The project under a container's name is a link of its own, to Compose.
+  if (document.querySelector("[data-goproj]")?.textContent !== "shop") throw new Error("the project's link");
   // The engine's name is Arabic words around a Latin one: an island, after docker and its arrow.
   const chip = document.querySelector(".statusbar .ctx-warn").textContent;
   if (!chip.includes("docker → \u2068" + tr("Docker's default engine") + "\u2069")) throw new Error("the status bar: " + JSON.stringify(chip));
@@ -183,7 +182,7 @@ t("English again from Settings: left to right, as before", () => {
   if (/[\u200F\u2068\u2069]/.test(tr("of {cap}", { cap: "5.0 GB" }))) throw new Error("marks left in English");
   if (document.querySelector("[dir=auto]")) throw new Error("dir=auto left on " + document.querySelector("[dir=auto]").className);
   show("containers");
-  const joined = document.querySelector("tr.group .sub-name").textContent + document.querySelector(".statusbar .ctx-warn").textContent + shTarget({ source: "old-web", target: "localhost:8080" });
+  const joined = document.querySelector(".statusbar .ctx-warn").textContent + shTarget({ source: "old-web", target: "localhost:8080" });
   if (/[\u200F\u2068\u2069←]/.test(joined) || !joined.includes("docker → Docker's default engine")) throw new Error("the joined lines: " + JSON.stringify(joined));
   if (getComputedStyle(document.querySelector("th:not(.ck)")).textAlign !== "left") throw new Error("headings didn't go back");
 });

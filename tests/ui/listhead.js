@@ -262,26 +262,17 @@ t("an untagged image's removal is by its ID, says nothing of its own, and the to
   const t = [...document.querySelectorAll(".toast.removed")].pop();
   eq([document.querySelectorAll(".toast.removed").length, t.querySelector("b").textContent, t.querySelector(".sub").textContent], [before + 1, "Removed bbb222", "Frees 400.0 MB"], "done");
 });
-t("a Compose project's row and its containers line up; the project's box picks them all", () => {
-  const P = (id, name) => ({ ...C(id, name, "running"), Labels: { "com.docker.compose.project": "shop" } });
+t("Compose containers are rows of their own; the project under the name opens it in Compose", () => {
+  const P = (id, name) => ({ ...C(id, name, "running"), Labels: { "com.docker.compose.project": "shop", "com.docker.compose.service": name.replace("shop-", "") } });
   ui.containers.push(P("p1", "shop-web"), P("p2", "shop-db"));
   show("containers");
-  const g = document.querySelector('#content tr.group[data-group="shop"]');
-  const gb = () => document.querySelector('#content tr.group[data-group="shop"] [data-gpick]');
-  eq([g.cells[0].className, !!gb(), g.hasAttribute("data-pick")], ["ck", true, false], "group: a box of its own, not a row key");
-  click(gb());
-  eq([[...ui.pick.keys].sort(), gb().getAttribute("aria-checked")], [["p1", "p2"], "true"], "its box picks every container in it");
-  click(box("p2"));
-  eq(gb().getAttribute("aria-checked"), "mixed", "a dash when only some are");
-  click(gb()); click(gb());
-  eq(ui.pick.keys.size, 0, "ticked again, then cleared");
-  eq([!!box("p1"), row("p1").dataset.pick], [true, "p1"], "its containers have boxes");
-  eq(span(g), span(document.querySelector("#content thead tr")), "same columns as the head");
-  eq(span(row("p1")), span(g), "and as its rows");
-  click(g.cells[1]);
-  eq([ui.pick.keys.size, g.getAttribute("aria-expanded")], [0, "false"], "a click folds it, picks nothing");
-  eq([order().includes("p1"), !!box("p1")], [false, false], "a folded row can't be picked");
-  click(document.querySelector('#content tr.group[data-group="shop"]').cells[1]);
+  eq([!!document.querySelector("#content tr.group"), !!box("p1"), !!box("p2")], [false, true, true], "no group row; each container has its own box");
+  eq(span(row("p1")), span(document.querySelector("#content thead tr")), "same columns as the head");
+  const link = row("p1").querySelector("[data-goproj]");
+  eq([link?.dataset.goproj, getComputedStyle(link).cursor], ["shop", "pointer"], "the project, as a link");
+  click(link);
+  eq([ui.view, cmp.open, sent.some((m) => m.cmd === "composefile" && m.name === "shop")], ["compose", "shop", true], "opens the project in Compose");
+  show("containers");
   ui.containers = ui.containers.filter((c) => !c.Id.startsWith("p")); render();
 });
 t("a built-in network has no box; one you made does", () => {
