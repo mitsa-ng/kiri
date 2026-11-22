@@ -92,6 +92,7 @@ volume-prune-keeps-opts	#623	a volume prune deleted volumes made with driver opt
 build-prune-until-date	#623	a build-cache prune did not take until as a date
 dns-default-bridge-gateway	#624	on a host whose resolver is one of its own addresses (WSL), the default bridge got a loopback resolver
 dns-default-bridge-no-loopback	#624	on a host whose resolver is one of its own addresses (WSL), the default bridge got 127.0.0.11
+network-rm-init-gateway-dns	#248	a removed network's DNS listener stayed open in an --init container's PID 1, so the next network on that subnet had no DNS at its gateway (and, before #642, no container could start on it)
 build-resolvconf	#624	on a host whose resolver is one of its own addresses (WSL), build steps did not get Kiri's resolver
 build-no-public-resolver	#624	on a host whose resolver is one of its own addresses (WSL), BuildKit put 8.8.8.8 in build steps
 user-net-own-dns-server	#624	a container on a user network could not bind port 53 for its own DNS server
@@ -143,3 +144,4 @@ frame-limit-request-alone	#658	a request over the agent's frame limit ended the 
 user-boundaries	#664	a numeric user not in /etc/passwd did not get group 0
 ncpu-engine-cpus	#659	on a Linux host docker info's NCPU was the Mac VM's default of 2, not the CPUs the engine may run on
 ncpu-affinity	#659	an engine under a three-CPU affinity mask must say NCPU 3 (the old count said 2)
+network-rm-failed-start-gateway-dns	#248	a start that failed on a network left a DNS listener at its gateway after the network was removed
